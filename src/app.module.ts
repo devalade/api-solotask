@@ -10,7 +10,9 @@ import { StatusEntity } from './status/status.entity';
 import { TaskModule } from './task/task.module';
 import { TaskEntity } from './task/task.entity';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { AccessTokenGuard } from './common/decorators/guards';
 
 @Module({
   imports: [
@@ -33,7 +35,13 @@ import { ConfigModule } from '@nestjs/config';
     TaskModule,
     AuthModule,
   ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AccessTokenGuard,
+    },
+  ],
 })
 export class AppModule {
-  constructor(private connection: Connection) {}
+  constructor(private connection: Connection, private config: ConfigService) {}
 }

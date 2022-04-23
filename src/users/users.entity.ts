@@ -35,6 +35,9 @@ export class UsersEntity {
   @Column({ default: true })
   isActive: boolean;
 
+  @Column({ unique: true, nullable: true })
+  refreshTokenHash: string;
+
   @ManyToMany(() => ProjectsEntity, (project) => project.users)
   @JoinTable({ name: 'participate_to_project' })
   projects: ProjectsEntity[];
@@ -45,7 +48,11 @@ export class UsersEntity {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  async compare(incomePassowrd: string) {
+  async comparePassword(incomePassowrd: string) {
     return await argon2.verify(this.password, incomePassowrd);
+  }
+
+  async compareRefreshTokenshash(incomePassowrd: string) {
+    return await argon2.verify(this.refreshTokenHash, incomePassowrd);
   }
 }

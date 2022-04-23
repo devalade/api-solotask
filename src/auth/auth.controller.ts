@@ -1,56 +1,54 @@
-import { Body, Controller, Get, HttpStatus, Post } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
-import { AuthDto, SignInDto } from './auth.dto';
-// import { AuthDto } from './dto';
-// import { AuthDto } from './dto/auth.dto';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { AuthDto, SignInDto } from './dto';
+import { Tokens } from './types';
+import { GetCurrentUser, Public } from '@src/common/decorators';
+import {
+  AccessTokenGuard,
+  RefreshTokenGuard,
+} from '@src/common/decorators/guards';
 
-@Controller()
+@Controller('auth')
 export class AuthController {
-  constructor(private userService: UsersService) {}
+  constructor(private authService: AuthService) {}
 
-  @Post('signup')
-  async signup(@Body() data: AuthDto) {
-    const isAlreadyExist = await this.userService.findByEmail(data.email);
-
-    if (isAlreadyExist) {
-      return {
-        status: HttpStatus.FORBIDDEN,
-        message: 'Credentials has been taken',
-      };
-    }
-    const user = await this.userService.store<AuthDto>(data);
-
-    return {
-      status: HttpStatus.CREATED,
-      data: user,
-      message: 'User created successfully',
-    };
+  @Public()
+  @Post('local/signup')
+  @HttpCode(HttpStatus.CREATED)
+  signup(@Body() dto: AuthDto): Promise<Tokens> {
+    return this.authService.signupLocal(dto);
   }
 
-  @Post('signin')
-  async signin(@Body() data: SignInDto) {
-    const user = await this.userService.findByEmail(data.email);
+  @Public()
+  @Post('local/signin')
+  @HttpCode(HttpStatus.OK)
+  async signin(@Body() dto: SignInDto): Promise<Tokens> {
+    return this.authService.signinLocal(dto);
+  }
 
-    if (!user) {
-      return {
-        status: HttpStatus.FORBIDDEN,
-        message: 'Email or password not correct',
-      };
-    }
+  @UseGuards(AccessTokenGuard)
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  logout(@GetCurrentUser('sub') userId: string) {
+    console.log(userId);
+    return this.authService.logout(userId);
+  }
 
-    const isMatch = user.compare(data.password);
-    if (!isMatch) {
-      return {
-        status: HttpStatus.FORBIDDEN,
-        message: 'Email or password not correct',
-      };
-    }
-    delete user.password;
-
-    return {
-      status: HttpStatus.OK,
-      message: 'User is connected successfully',
-      user,
-    };
+  @Public()
+  @UseGuards(RefreshTokenGuard)
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  refresh(
+    @GetCurrentUser('sub') userId: string,
+    @GetCurrentUser('refreshToken') refreshToken: string,
+  ): Promise<Tokens> {
+    return this.authService.refreshTokens(userId, refreshToken);
   }
 }
