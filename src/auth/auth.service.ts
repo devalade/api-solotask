@@ -4,7 +4,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UsersEntity } from '@src/users/users.entity';
+import { UserEntity } from '@src/user/user.entity';
 import { IsNull, Not, QueryFailedError, Repository } from 'typeorm';
 import { AuthDto, SignInDto } from './dto';
 import { Tokens } from './types';
@@ -15,21 +15,21 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(UsersEntity)
-    private usersRepository: Repository<UsersEntity>,
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>,
     private jwtService: JwtService,
     private config: ConfigService,
   ) {}
 
   async signupLocal(dto: AuthDto): Promise<Tokens> {
-    const newUser = this.usersRepository.create({
+    const newUser = this.userRepository.create({
       email: dto.email,
       password: dto.password,
       lastName: dto.lastName,
       firstName: dto.firstName,
     });
     try {
-      await this.usersRepository.save(newUser);
+      await this.userRepository.save(newUser);
     } catch (error) {
       if (error instanceof QueryFailedError && error['code'] == 23505) {
         throw new ConflictException('Email already exist');
@@ -45,7 +45,7 @@ export class AuthService {
 
   async signinLocal(dto: SignInDto): Promise<Tokens> {
     console.log(dto);
-    const user = await this.usersRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: { email: dto.email },
     });
 
@@ -59,13 +59,13 @@ export class AuthService {
     return tokens;
   }
   async logout(userId: string) {
-    await this.usersRepository.update(
+    await this.userRepository.update(
       { id: userId, refreshTokenHash: Not(IsNull()) },
       { refreshTokenHash: null },
     );
   }
   async refreshTokens(userId: string, refreshToken: string): Promise<Tokens> {
-    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user || !user.refreshTokenHash)
       throw new ForbiddenException('Access Denied');
 
@@ -104,10 +104,10 @@ export class AuthService {
   async updateResfreshTokenHash(userId: string, refreshToken: string) {
     const hash = await argon2.hash(refreshToken);
 
-    await this.usersRepository.update(
+    await this.userRepository.update(
       { id: userId },
       { refreshTokenHash: hash },
     );
-    // await this.usersRepository.save();
+    // await this.userRepository.save();
   }
 }

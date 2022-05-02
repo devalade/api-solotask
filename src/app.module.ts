@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
-import { UsersEntity } from './users/users.entity';
-import { UsersModule } from './users/users.module';
+import { UserEntity } from './user/user.entity';
+import { UserModule } from './user/user.module';
 import { ProjectModule } from './project/project.module';
 import { ProjectEntity } from './project/project.entity';
 import { StatusModule } from './status/status.module';
@@ -26,10 +26,10 @@ import { AccessTokenGuard } from './common/decorators/guards';
       username: 'devalade',
       password: 'devalade',
       database: 'projectmanager',
-      entities: [UsersEntity, ProjectEntity, StatusEntity, TaskEntity],
+      entities: [UserEntity, ProjectEntity, StatusEntity, TaskEntity],
       synchronize: true,
     }),
-    UsersModule,
+    UserModule,
     ProjectModule,
     StatusModule,
     TaskModule,

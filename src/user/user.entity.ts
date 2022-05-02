@@ -11,8 +11,8 @@ import {
 import * as argon2 from 'argon2';
 import { ProjectEntity } from '@src/project/project.entity';
 
-@Entity('users')
-export class UsersEntity {
+@Entity('user')
+export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -38,7 +38,7 @@ export class UsersEntity {
   @Column({ unique: true, nullable: true })
   refreshTokenHash: string;
 
-  @ManyToMany(() => ProjectEntity, (project) => project.users)
+  @ManyToMany(() => ProjectEntity, (project) => project.user)
   @JoinTable({ name: 'participate_to_project' })
   project: ProjectEntity[];
 

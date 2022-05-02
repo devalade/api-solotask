@@ -1,6 +1,6 @@
 import { StatusEntity } from '@src/status/status.entity';
 import { TaskEntity } from '@src/task/task.entity';
-import { UsersEntity } from '@src/users/users.entity';
+import { UserEntity } from '@src/user/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -29,9 +29,9 @@ export class ProjectEntity {
   })
   tasks: TaskEntity[];
 
-  @ManyToMany(() => UsersEntity, (users) => users.project)
+  @ManyToMany(() => UserEntity, (user) => user.project)
   @JoinTable({ name: 'participate_to_project' })
-  users: UsersEntity[];
+  user: UserEntity[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
