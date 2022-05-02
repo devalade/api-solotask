@@ -1,8 +1,8 @@
 {
-  "name": "api-project-manager",
+  "name": "api-solowtask",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "devalade",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {

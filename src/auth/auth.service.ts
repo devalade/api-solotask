@@ -1,9 +1,7 @@
 import {
+  ConflictException,
   ForbiddenException,
-  Get,
-  HttpStatus,
   Injectable,
-  Param,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersEntity } from '@src/users/users.entity';
@@ -34,14 +32,13 @@ export class AuthService {
       await this.usersRepository.save(newUser);
     } catch (error) {
       if (error instanceof QueryFailedError && error['code'] == 23505) {
-        throw new ForbiddenException('Email already exist');
+        throw new ConflictException('Email already exist');
       }
       console.log(error);
     }
 
     const tokens = await this.getTokens(newUser.id, newUser.email);
     await this.updateResfreshTokenHash(newUser.id, tokens.refresh_token);
-    // const hash = await argon2.hash(refreshToken);
 
     return tokens;
   }

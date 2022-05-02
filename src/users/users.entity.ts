@@ -9,7 +9,7 @@ import {
   JoinTable,
 } from 'typeorm';
 import * as argon2 from 'argon2';
-import { ProjectsEntity } from '@src/projects/projects.entity';
+import { ProjectEntity } from '@src/project/project.entity';
 
 @Entity('users')
 export class UsersEntity {
@@ -38,9 +38,9 @@ export class UsersEntity {
   @Column({ unique: true, nullable: true })
   refreshTokenHash: string;
 
-  @ManyToMany(() => ProjectsEntity, (project) => project.users)
+  @ManyToMany(() => ProjectEntity, (project) => project.users)
   @JoinTable({ name: 'participate_to_project' })
-  projects: ProjectsEntity[];
+  project: ProjectEntity[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

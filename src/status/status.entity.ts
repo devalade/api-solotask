@@ -1,4 +1,4 @@
-import { ProjectsEntity } from '@src/projects/projects.entity';
+import { ProjectEntity } from '@src/project/project.entity';
 import { TaskEntity } from '@src/task/task.entity';
 import {
   Column,
@@ -19,9 +19,9 @@ export class StatusEntity {
   @Column()
   text: string;
 
-  @ManyToOne(() => ProjectsEntity, (project) => project.status)
+  @ManyToOne(() => ProjectEntity, (project) => project.status)
   @JoinTable()
-  project: ProjectsEntity;
+  project: ProjectEntity;
 
   @OneToMany(() => TaskEntity, (task) => task.status)
   @JoinTable()

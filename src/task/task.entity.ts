@@ -1,4 +1,4 @@
-import { ProjectsEntity } from '@src/projects/projects.entity';
+import { ProjectEntity } from '@src/project/project.entity';
 import { StatusEntity } from '@src/status/status.entity';
 import {
   Column,
@@ -22,9 +22,9 @@ export class TaskEntity {
   @JoinTable()
   status: StatusEntity;
 
-  @ManyToOne(() => ProjectsEntity, (project) => project.tasks)
+  @ManyToOne(() => ProjectEntity, (project) => project.tasks)
   @JoinTable()
-  projects: ProjectsEntity;
+  project: ProjectEntity;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
